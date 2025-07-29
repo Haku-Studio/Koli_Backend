@@ -17,7 +17,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       clientID,
       clientSecret,
       callbackURL,
-      scope: ['email', 'profile'],
+      scope: ['email', 'profile', 'phone'],
     });
   }
 
@@ -31,12 +31,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     },
   ) {
     const { emails, name, photos } = profile;
-    const firstName = name.givenName;
-    const lastName = name.familyName;
+    const firstName = name.givenName || '';
+    const lastName = name.familyName || '';
 
     return {
       email: emails[0].value,
-      name: firstName + ' ' + lastName || '',
+      name: firstName + ' ' + lastName,
       picture: photos[0].value,
       provider: 'google',
       //   accessToken,

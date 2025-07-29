@@ -4,9 +4,9 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class RequestService {
-  // create(createRequestDto: CreateRequestDto) {
-  //   return 'This action adds a new request';
-  // }
+  create() {
+    return 'This action adds a new request';
+  }
 
   findAll() {
     return `This action returns all request`;
@@ -16,9 +16,9 @@ export class RequestService {
     return `This action returns a #${id} request`;
   }
 
-  // update(id: number, updateRequestDto: UpdateRequestDto) {
-  //   return `This action updates a #${id} request`;
-  // }
+  update(id: number) {
+    return `This action updates a #${id} request`;
+  }
 
   remove(id: number) {
     return `This action removes a #${id} request`;

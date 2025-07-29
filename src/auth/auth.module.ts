@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
@@ -7,21 +6,22 @@ import { UserService } from 'src/user/user.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { ConfigModule } from '@nestjs/config';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
-    ConfigModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     TypeOrmModule.forFeature([User]),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '1h' },
-      }),
-      inject: [ConfigService],
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '1h' },
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, UserService, GoogleStrategy],
+  providers: [AuthService, UserService, GoogleStrategy, JwtStrategy],
 })
 export class AuthModule {}

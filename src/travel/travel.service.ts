@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTravelDto } from './dto/create-travel.dto';
-import { UpdateTravelDto } from './dto/update-travel.dto';
+// import { CreateTravelDto } from './dto/create-travel.dto';
+// import { UpdateTravelDto } from './dto/update-travel.dto';
 
 @Injectable()
 export class TravelService {
-  create(createTravelDto: CreateTravelDto) {
-    return 'This action adds a new travel';
+  create() {
+    throw new Error('Method not implemented.');
   }
 
   findAll() {
@@ -16,7 +16,7 @@ export class TravelService {
     return `This action returns a #${id} travel`;
   }
 
-  update(id: number, updateTravelDto: UpdateTravelDto) {
+  update(id: number) {
     return `This action updates a #${id} travel`;
   }
 
