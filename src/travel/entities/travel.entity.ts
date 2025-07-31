@@ -22,8 +22,14 @@ export class Travel {
   @Column({ type: 'datetime' })
   departureDate: Date;
 
+  @Column({ type: 'datetime' })
+  arrivalDate: Date;
+
   @Column({ type: 'float' })
   weightAvailable: number;
+
+  @Column({ type: 'float', nullable: true })
+  pricePerKg: number;
 
   @ManyToOne(() => User, (user) => user.travels, { onDelete: 'CASCADE' })
   owner: User;

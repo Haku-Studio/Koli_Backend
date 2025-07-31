@@ -3,40 +3,58 @@ import {
   Get,
   Post,
   Body,
+  Patch,
+  // UseInterceptors,
   Param,
   Delete,
   UseGuards,
-  Patch,
+  Req,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import ReqUser from 'src/interfaces/reqUser';
 import { RequestService } from './request.service';
+import { CreateRequestDto } from './dto/create-request.dto';
+import { UpdateRequestDto } from './dto/update-request.dto';
+// import { ResponseInterceptor } from 'src/interceptors/response.interceptor';
 
-@Controller('request')
+@Controller('requests')
+// @UseInterceptors(ResponseInterceptor)
 @UseGuards(JwtAuthGuard)
 export class RequestController {
   constructor(private readonly requestService: RequestService) {}
 
   @Post()
-  create() {
-    return 'created with success';
+  createRequest(@Body() requestDto: CreateRequestDto, @Req() req: ReqUser) {
+    return this.requestService.create(requestDto, req);
   }
+
   @Get()
-  findAll() {
+  getRequests() {
     return this.requestService.findAll();
   }
 
+  @Get('owner')
+  getRequestsByOwner(@Req() req: ReqUser) {
+    return this.requestService.findByRequester(req.user.id);
+  }
+
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.requestService.findOne(+id);
+  getOneRequest(@Param('id', ParseIntPipe) id: number) {
+    return this.requestService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string) {
-    return this.requestService.update(+id);
+  updateRequest(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() requestDto: UpdateRequestDto,
+    @Req() req: ReqUser,
+  ) {
+    return this.requestService.update(id, requestDto, req);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.requestService.remove(+id);
+  deleteTravel(@Param('id', ParseIntPipe) id: number) {
+    return this.requestService.remove(id);
   }
 }
