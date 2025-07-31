@@ -2,6 +2,7 @@ import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -14,14 +15,9 @@ export class AuthController {
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req: Request) {
-    const user = req.user as {
-      email: string;
-      name: string;
-      picture: string;
-      provider: string;
-    };
+    // console.log('req.user', req.user);
 
-    return await this.authService.socialLogin(user);
+    return await this.authService.socialLogin(req.user as CreateUserDto);
   }
 
   //   @Get('facebook')

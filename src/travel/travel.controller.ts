@@ -8,14 +8,16 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
+  // Req,
   ParseIntPipe,
 } from '@nestjs/common';
 import { TravelService } from './travel.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CreateTravelDto } from './dto/create-travel.dto';
 import { UpdateTravelDto } from './dto/update-travel.dto';
-import ReqUser from 'src/interfaces/reqUser';
+// import ReqUser from 'src/common/interfaces/reqUser';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { User } from 'src/user/entities/user.entity';
 // import { ResponseInterceptor } from 'src/interceptors/response.interceptor';
 
 @Controller('travels')
@@ -25,8 +27,8 @@ export class TravelController {
   constructor(private readonly travelService: TravelService) {}
 
   @Post()
-  createTravel(@Body() travelDto: CreateTravelDto, @Req() req: ReqUser) {
-    return this.travelService.create(travelDto, req);
+  createTravel(@Body() travelDto: CreateTravelDto, @CurrentUser() user: User) {
+    return this.travelService.create(travelDto, user);
   }
 
   @Get()
@@ -35,8 +37,8 @@ export class TravelController {
   }
 
   @Get('owner')
-  getTravelsByOwner(@Req() req: ReqUser) {
-    return this.travelService.findByOwner(req.user.id);
+  getTravelsByOwner(@CurrentUser() user: User) {
+    return this.travelService.findByOwner(user.id);
   }
 
   @Get(':id')
@@ -48,9 +50,9 @@ export class TravelController {
   updateTravel(
     @Param('id', ParseIntPipe) id: number,
     @Body() travelDto: UpdateTravelDto,
-    @Req() req: ReqUser,
+    @CurrentUser() user: User,
   ) {
-    return this.travelService.update(id, travelDto, req);
+    return this.travelService.update(id, travelDto, user);
   }
 
   @Delete(':id')

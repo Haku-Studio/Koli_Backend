@@ -8,5 +8,5 @@ export class CreateRequestDto {
   description?: string;
 
   @IsNotEmpty()
-  travelId: number;
+  travel: number;
 }

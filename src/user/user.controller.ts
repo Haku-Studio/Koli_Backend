@@ -5,13 +5,25 @@ import {
   Body,
   // Patch,
   Param,
-  Delete,
+  // Delete,
+  UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { User } from './entities/user.entity';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
+@UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get('me')
+  getProfile(@CurrentUser() user: User) {
+    return user;
+  }
 
   @Get()
   findAll() {
@@ -23,8 +35,13 @@ export class UserController {
     return this.userService.findOne(+id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  @Patch('me')
+  updateProfile(@CurrentUser() user: User, @Body() userDto: UpdateUserDto) {
+    return this.userService.update(user.id, userDto);
   }
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.userService.remove(+id);
+  // }
 }

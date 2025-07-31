@@ -4,7 +4,8 @@ import { Travel } from './entities/travel.entity';
 import { Repository } from 'typeorm';
 import { CreateTravelDto } from './dto/create-travel.dto';
 import { UpdateTravelDto } from './dto/update-travel.dto';
-import ReqUser from 'src/interfaces/reqUser';
+// import ReqUser from 'src/common/interfaces/reqUser';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class TravelService {
@@ -13,12 +14,12 @@ export class TravelService {
     private travelRepository: Repository<Travel>,
   ) {}
 
-  create(travelDto: CreateTravelDto, req: ReqUser) {
+  create(travelDto: CreateTravelDto, user: User) {
     const travel = this.travelRepository.create({
       ...travelDto,
       departureDate: new Date(travelDto.departureDate),
       arrivalDate: new Date(travelDto.arrivalDate),
-      owner: req.user,
+      owner: user,
     });
     return this.travelRepository.save(travel);
   }
@@ -48,10 +49,10 @@ export class TravelService {
   async update(
     id: number,
     travelDto: UpdateTravelDto,
-    req: ReqUser,
+    user: User,
   ): Promise<Travel> {
     const travel = await this.findOne(id);
-    if (travel.owner.id !== req.user.id) {
+    if (travel.owner.id !== user.id) {
       throw new NotFoundException(
         "Vous n'êtes pas autorisé à modifier ce voyage",
       );

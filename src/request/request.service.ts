@@ -1,10 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import ReqUser from 'src/interfaces/reqUser';
+// import ReqUser from 'src/common/interfaces/reqUser';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { Requests } from './entities/request.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class RequestService {
@@ -13,10 +19,23 @@ export class RequestService {
     private requestsRepository: Repository<Requests>,
   ) {}
 
-  create(requestDto: CreateRequestDto, req: ReqUser) {
+  // se rassurer que l'utilisateur n'a pas déjà une requete en cours pour le même voyage
+  async create(requestDto: CreateRequestDto, user: User) {
+    const existingRequest = await this.requestsRepository.findOne({
+      where: { travel: { id: requestDto.travel }, requester: user },
+    });
+    if (existingRequest) {
+      throw new ConflictException(
+        'Vous avez déjà une demande en cours pour ce voyage',
+      );
+    }
+    if (requestDto.weight <= 0) {
+      throw new BadRequestException('Le poids doit être supérieur à 0');
+    }
     const request = this.requestsRepository.create({
       ...requestDto,
-      requester: req.user,
+      travel: { id: requestDto.travel },
+      requester: user,
     });
     return this.requestsRepository.save(request);
   }
@@ -43,10 +62,10 @@ export class RequestService {
   async update(
     id: number,
     requestDto: UpdateRequestDto,
-    req: ReqUser,
+    user: User,
   ): Promise<Requests> {
     const request = await this.findOne(id);
-    if (request.requester.id !== req.user.id) {
+    if (request.requester.id !== user.id) {
       throw new NotFoundException(
         "Vous n'êtes pas autorisé à modifier cette demande",
       );

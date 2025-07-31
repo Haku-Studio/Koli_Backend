@@ -8,14 +8,16 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
+  // Req,
   ParseIntPipe,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import ReqUser from 'src/interfaces/reqUser';
+// import ReqUser from 'src/common/interfaces/reqUser';
 import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
+import { User } from 'src/user/entities/user.entity';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 // import { ResponseInterceptor } from 'src/interceptors/response.interceptor';
 
 @Controller('requests')
@@ -25,8 +27,11 @@ export class RequestController {
   constructor(private readonly requestService: RequestService) {}
 
   @Post()
-  createRequest(@Body() requestDto: CreateRequestDto, @Req() req: ReqUser) {
-    return this.requestService.create(requestDto, req);
+  createRequest(
+    @Body() requestDto: CreateRequestDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.requestService.create(requestDto, user);
   }
 
   @Get()
@@ -35,8 +40,8 @@ export class RequestController {
   }
 
   @Get('owner')
-  getRequestsByOwner(@Req() req: ReqUser) {
-    return this.requestService.findByRequester(req.user.id);
+  getRequestsByOwner(@CurrentUser() user: User) {
+    return this.requestService.findByRequester(user.id);
   }
 
   @Get(':id')
@@ -48,9 +53,9 @@ export class RequestController {
   updateRequest(
     @Param('id', ParseIntPipe) id: number,
     @Body() requestDto: UpdateRequestDto,
-    @Req() req: ReqUser,
+    @CurrentUser() user: User,
   ) {
-    return this.requestService.update(id, requestDto, req);
+    return this.requestService.update(id, requestDto, user);
   }
 
   @Delete(':id')
