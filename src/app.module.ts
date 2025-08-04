@@ -14,6 +14,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TravelModule } from './travel/travel.module';
 import { RequestModule } from './request/request.module';
 import { ConfigModule } from '@nestjs/config';
+import { BusinessLogModule } from './business-log/business-log.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -32,9 +33,10 @@ import { ConfigModule } from '@nestjs/config';
       // Set to false in production
       synchronize: true,
     }),
+
     AuthModule,
+    BusinessLogModule,
     UserModule,
-    AuthModule,
     TravelModule,
     RequestModule,
   ],

@@ -6,22 +6,33 @@ import { CreateTravelDto } from './dto/create-travel.dto';
 import { UpdateTravelDto } from './dto/update-travel.dto';
 // import ReqUser from 'src/common/interfaces/reqUser';
 import { User } from 'src/user/entities/user.entity';
+import { BusinessLogService } from 'src/business-log/business-log.service';
 
 @Injectable()
 export class TravelService {
   constructor(
+    private readonly logService: BusinessLogService,
     @InjectRepository(Travel)
     private travelRepository: Repository<Travel>,
   ) {}
 
-  create(travelDto: CreateTravelDto, user: User) {
+  async create(travelDto: CreateTravelDto, user: User) {
     const travel = this.travelRepository.create({
       ...travelDto,
       departureDate: new Date(travelDto.departureDate),
       arrivalDate: new Date(travelDto.arrivalDate),
       owner: user,
     });
-    return this.travelRepository.save(travel);
+
+    const savedTravel = await this.travelRepository.save(travel);
+
+    await this.logService.log(user.id, 'CREATE_TRAVEL', 'Travel', {
+      travelId: savedTravel.id,
+      from: travelDto.from,
+      to: travelDto.to,
+    });
+
+    return savedTravel;
   }
 
   async findAll(): Promise<Travel[]> {
@@ -59,7 +70,16 @@ export class TravelService {
     }
 
     Object.assign(travel, travelDto);
-    return await this.travelRepository.save(travel);
+
+    const savedTravel = await this.travelRepository.save(travel);
+
+    await this.logService.log(user.id, 'UPDATE_TRAVEL', 'Travel', {
+      travelId: savedTravel.id,
+      from: travelDto.from,
+      to: travelDto.to,
+    });
+
+    return savedTravel;
   }
 
   remove(id: number) {
