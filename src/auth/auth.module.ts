@@ -8,9 +8,11 @@ import { AuthService } from './auth.service';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { ConfigModule } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { BusinessLogModule } from 'src/business-log/business-log.module';
 
 @Module({
   imports: [
+    BusinessLogModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

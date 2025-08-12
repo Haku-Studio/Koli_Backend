@@ -15,12 +15,21 @@ import { TravelModule } from './travel/travel.module';
 import { RequestModule } from './request/request.module';
 import { ConfigModule } from '@nestjs/config';
 import { BusinessLogModule } from './business-log/business-log.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60,
+        limit: 100,
+      },
+    ]),
+
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
+
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DB_HOST,

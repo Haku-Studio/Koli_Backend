@@ -11,10 +11,12 @@ import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { Requests } from './entities/request.entity';
 import { User } from 'src/user/entities/user.entity';
+import { BusinessLogService } from 'src/business-log/business-log.service';
 
 @Injectable()
 export class RequestService {
   constructor(
+    private readonly logService: BusinessLogService,
     @InjectRepository(Requests)
     private requestsRepository: Repository<Requests>,
   ) {}
@@ -37,7 +39,15 @@ export class RequestService {
       travel: { id: requestDto.travel },
       requester: user,
     });
-    return this.requestsRepository.save(request);
+
+    const savedRequest = await this.requestsRepository.save(request);
+
+    await this.logService.log(user.id, 'CREATE_REQUEST', 'Request', {
+      requestId: savedRequest.id,
+      weight: savedRequest.weight,
+      requester: savedRequest.requester,
+    });
+    return savedRequest;
   }
 
   async findAll(): Promise<Requests[]> {
@@ -72,7 +82,15 @@ export class RequestService {
     }
 
     Object.assign(request, requestDto);
-    return await this.requestsRepository.save(request);
+
+    const savedRequest = await this.requestsRepository.save(request);
+
+    await this.logService.log(user.id, 'UPDATE_REQUEST', 'Request', {
+      requestId: savedRequest.id,
+      weight: savedRequest.weight,
+      requester: savedRequest.requester,
+    });
+    return savedRequest;
   }
 
   remove(id: number) {
