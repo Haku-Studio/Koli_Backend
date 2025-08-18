@@ -46,11 +46,11 @@ export class AuthService {
 
       await this.userRepository.save(existingUser);
 
-      await this.logService.log(
-        existingUser.id,
-        'REGISTERLOGIN_USER',
-        'Request',
-      );
+      // await this.logService.log(
+      //   {existingUser.id,
+      //   'REGISTERLOGIN_USER',
+      //   'Request',}
+      // );
     }
 
     const payload = { email: existingUser.email, sub: existingUser.id };

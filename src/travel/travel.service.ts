@@ -26,11 +26,16 @@ export class TravelService {
 
     const savedTravel = await this.travelRepository.save(travel);
 
-    await this.logService.log(user.id, 'CREATE_TRAVEL', 'Travel', {
-      travelId: savedTravel.id,
-      from: travelDto.from,
-      to: travelDto.to,
-    });
+    // await this.logService.log({
+    //   userId: user.id,
+    //   action: 'CREATE_TRAVEL',
+    //   entity: 'Travel',
+    //   meta: {
+    //     travelId: savedTravel.id,
+    //     from: travelDto.from,
+    //     to: travelDto.to,
+    //   },
+    // });
 
     return savedTravel;
   }
@@ -73,11 +78,16 @@ export class TravelService {
 
     const savedTravel = await this.travelRepository.save(travel);
 
-    await this.logService.log(user.id, 'UPDATE_TRAVEL', 'Travel', {
-      travelId: savedTravel.id,
-      from: travelDto.from,
-      to: travelDto.to,
-    });
+    // await this.logService.log({
+    //   userId: user.id,
+    //   action: 'UPDATE_TRAVEL',
+    //   entity: 'Travel',
+    //   meta: {
+    //     travelId: savedTravel.id,
+    //     from: travelDto.from,
+    //     to: travelDto.to,
+    //   },
+    // });
 
     return savedTravel;
   }

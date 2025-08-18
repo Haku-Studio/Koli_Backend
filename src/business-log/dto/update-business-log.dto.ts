@@ -1,4 +1,15 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateBusinessLogDto } from './create-business-log.dto';
+import { IsOptional, IsString, IsInt } from 'class-validator';
 
-export class UpdateBusinessLogDto extends PartialType(CreateBusinessLogDto) {}
+export class UpdateBusinessLogDto {
+  @IsOptional()
+  @IsInt()
+  userId?: number;
+
+  @IsOptional()
+  @IsString()
+  action?: string;
+
+  @IsOptional()
+  @IsString()
+  entity?: string;
+}

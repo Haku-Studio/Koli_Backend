@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { BusinessLog } from './entities/business-log.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UpdateBusinessLogDto } from './dto/update-business-log.dto';
+import { CreateBusinessLogDto } from './dto/create-business-log.dto';
 
 @Injectable()
 export class BusinessLogService {
@@ -10,18 +12,17 @@ export class BusinessLogService {
     private readonly businessLogRepository: Repository<BusinessLog>,
   ) {}
 
-  log(
-    userId: number,
-    action: string,
-    entity: string,
-    meta?: Record<string, any>,
-  ) {
-    const log = this.businessLogRepository.create({
-      userId,
-      action,
-      entity,
-      meta,
+  async log(createLogDto: CreateBusinessLogDto) {
+    const log = this.businessLogRepository.create(createLogDto);
+    return await this.businessLogRepository.save(log);
+  }
+
+  async findAll(fiters: UpdateBusinessLogDto) {
+    return this.businessLogRepository.find({
+      where: fiters,
+      order: {
+        createdAt: 'DESC',
+      },
     });
-    return this.businessLogRepository.save(log);
   }
 }
