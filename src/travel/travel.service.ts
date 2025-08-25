@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Travel } from './entities/travel.entity';
 import { Repository } from 'typeorm';
@@ -17,6 +21,8 @@ export class TravelService {
   ) {}
 
   async create(travelDto: CreateTravelDto, user: User) {
+    if (!user) throw new UnauthorizedException('Utilisateur non autorisé');
+
     const travel = this.travelRepository.create({
       ...travelDto,
       departureDate: new Date(travelDto.departureDate),
