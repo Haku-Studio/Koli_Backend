@@ -5,23 +5,29 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Travel } from './entities/travel.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { CreateTravelDto } from './dto/create-travel.dto';
 import { UpdateTravelDto } from './dto/update-travel.dto';
-// import ReqUser from 'src/common/interfaces/reqUser';
 import { User } from 'src/user/entities/user.entity';
-import { BusinessLogService } from 'src/business-log/business-log.service';
 
 @Injectable()
 export class TravelService {
   constructor(
-    private readonly logService: BusinessLogService,
     @InjectRepository(Travel)
     private travelRepository: Repository<Travel>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async create(travelDto: CreateTravelDto, user: User) {
     if (!user) throw new UnauthorizedException('Utilisateur non autorisé');
+
+    const userPhoneNumber = travelDto.phoneNumber;
+
+    if (userPhoneNumber) {
+      user.phone = userPhoneNumber;
+      user = await this.userRepository.save(user);
+    }
 
     const travel = this.travelRepository.create({
       ...travelDto,
@@ -46,8 +52,10 @@ export class TravelService {
     return savedTravel;
   }
 
-  async findAll(): Promise<Travel[]> {
+  async findAll(user: User): Promise<Travel[]> {
+    // find travel that doesn't belong to the connected user
     return await this.travelRepository.find({
+      where: { owner: { id: Not(user.id) } },
       order: { departureDate: 'ASC' },
     });
   }
@@ -66,6 +74,36 @@ export class TravelService {
     });
     if (!travel) throw new NotFoundException('Voyage introuvable');
     return travel;
+  }
+
+  async findWithParams(params: Partial<Travel>): Promise<Travel[]> {
+    const query = this.travelRepository.createQueryBuilder('travel');
+
+    if (params.from) {
+      query.andWhere('travel.from LIKE :from', { from: `%${params.from}%` });
+    }
+    if (params.to) {
+      query.andWhere('travel.to LIKE :to', { to: `%${params.to}%` });
+    }
+    if (params.weightAvailable) {
+      query.andWhere('travel.weightAvailable >= :weightAvailable', {
+        weightAvailable: params.weightAvailable,
+      });
+    }
+    if (params.departureDate) {
+      query.andWhere('travel.departureDate >= :departureDate', {
+        departureDate: new Date(params.departureDate),
+      });
+    }
+    if (params.arrivalDate) {
+      query.andWhere('travel.arrivalDate <= :arrivalDate', {
+        arrivalDate: new Date(params.arrivalDate),
+      });
+    }
+
+    query.orderBy('travel.departureDate', 'ASC');
+
+    return await query.getMany();
   }
 
   async update(

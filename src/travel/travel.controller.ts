@@ -18,6 +18,7 @@ import { UpdateTravelDto } from './dto/update-travel.dto';
 // import ReqUser from 'src/common/interfaces/reqUser';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { User } from 'src/user/entities/user.entity';
+import { Travel } from './entities/travel.entity';
 // import { ResponseInterceptor } from 'src/interceptors/response.interceptor';
 
 @Controller('travels')
@@ -32,8 +33,13 @@ export class TravelController {
   }
 
   @Get()
-  getTravels() {
-    return this.travelService.findAll();
+  getTravels(@CurrentUser() user: User) {
+    return this.travelService.findAll(user);
+  }
+
+  @Post('search')
+  getTravelsWithParams(@Body() searchParams: Partial<Travel>) {
+    return this.travelService.findWithParams(searchParams);
   }
 
   @Get('owner')

@@ -5,7 +5,8 @@ export class CreateRequestDto {
   @Min(0.1)
   weight: number;
 
-  description?: string;
+  @IsNotEmpty()
+  description: string;
 
   @IsNotEmpty()
   travel: number;

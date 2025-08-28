@@ -41,17 +41,6 @@ export class RequestService {
     });
 
     const savedRequest = await this.requestsRepository.save(request);
-
-    // await this.logService.log({
-    //   userId: user.id,
-    //   action: 'CREATE_REQUEST',
-    //   entity: 'Request',
-    //   meta: {
-    //     requestId: savedRequest.id,
-    //     weight: savedRequest.weight,
-    //     requester: savedRequest.requester,
-    //   },
-    // });
     return savedRequest;
   }
 
@@ -89,17 +78,6 @@ export class RequestService {
     Object.assign(request, requestDto);
 
     const savedRequest = await this.requestsRepository.save(request);
-
-    // await this.logService.log({
-    //   userId: user.id,
-    //   action: 'UPDATE_REQUEST',
-    //   entity: 'Request',
-    //   meta: {
-    //     requestId: savedRequest.id,
-    //     weight: savedRequest.weight,
-    //     requester: savedRequest.requester,
-    //   },
-    // });
     return savedRequest;
   }
 

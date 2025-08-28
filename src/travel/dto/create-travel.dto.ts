@@ -1,4 +1,11 @@
-import { IsDateString, IsNotEmpty, IsNumber, Min } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Min,
+  MinLength,
+} from 'class-validator';
 
 export class CreateTravelDto {
   @IsNotEmpty()
@@ -20,4 +27,9 @@ export class CreateTravelDto {
   @IsNumber()
   @Min(0)
   pricePerKg: number;
+
+  // min 6 caracteres
+  @IsString()
+  @MinLength(6)
+  phoneNumber: string;
 }
